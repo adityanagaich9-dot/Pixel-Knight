@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcade Hub — Play Indie Games Online</title>
+  <link rel="icon" type="image/png" href="games/pixel-knight/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Press+Start+2P&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0d14;
+      --card-bg: #121824;
+      --card-hover: #1b2334;
+      --primary: #4ade80;
+      --accent: #facc15;
+      --cyan: #38bdf8;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --border: #232d42;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(250, 204, 21, 0.06) 0%, transparent 45%);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      background: rgba(10, 13, 20, 0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #facc15, #f97316);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 0 15px rgba(250, 204, 21, 0.35);
+    }
+
+    .brand-name {
+      font-family: 'Cinzel', serif;
+      font-weight: 900;
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #f8fafc, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .badge-live {
+      background: rgba(74, 222, 128, 0.15);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      color: #4ade80;
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #4ade80;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #4ade80;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4rem 1.5rem 3rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 900;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      color: var(--muted);
+      font-size: 1.15rem;
+      line-height: 1.6;
+      max-width: 650px;
+      margin: 0 auto 2rem;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+      width: 100%;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    /* Game Card */
+    .game-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .game-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(56, 189, 248, 0.15);
+    }
+
+    .game-cover {
+      width: 100%;
+      height: 200px;
+      position: relative;
+      background: #182234;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .game-cover-art {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .game-card:hover .game-cover-art {
+      transform: scale(1.05);
+    }
+
+    .game-tag {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(10, 13, 20, 0.85);
+      border: 1px solid rgba(250, 204, 21, 0.5);
+      color: var(--accent);
+      padding: 0.3rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(8px);
+    }
+
+    .game-body {
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .game-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 0.5rem;
+    }
+
+    .game-desc {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      flex: 1;
+    }
+
+    .game-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+    }
+
+    .game-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .play-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      color: white;
+      text-decoration: none;
+      padding: 0.85rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    }
+
+    .play-btn:hover {
+      background: linear-gradient(135deg, #38bdf8, #3b82f6);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.45);
+      transform: translateY(-2px);
+    }
+
+    /* Coming Soon Card */
+    .coming-soon-card {
+      border: 1px dashed #334155;
+      background: rgba(18, 24, 36, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 3rem 1.5rem;
+      text-align: center;
+      border-radius: 16px;
+    }
+
+    .coming-soon-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+
+    .coming-soon-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+    }
+
+    .coming-soon-desc {
+      color: #64748b;
+      font-size: 0.9rem;
+      max-width: 280px;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.88rem;
+    }
+
+    /* Modal for Play in-page */
+    .game-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 9, 15, 0.95);
+      z-index: 100;
+      flex-direction: column;
+      backdrop-filter: blur(8px);
+    }
+
+    .game-modal.active {
+      display: flex;
+    }
+
+    .modal-header {
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+
+    .close-btn {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: #f1f5f9;
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .close-btn:hover {
+      background: #334155;
+    }
+
+    .modal-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .res-control {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .res-select {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: #38bdf8;
+      padding: 0.4rem 0.7rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .res-select:hover, .res-select:focus {
+      border-color: #38bdf8;
+    }
+
+    .tool-btn {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: #f1f5f9;
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.2s;
+    }
+
+    .tool-btn:hover {
+      background: #334155;
+      border-color: #94a3b8;
+    }
+
+    .iframe-container {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .game-frame {
+      width: 100%;
+      max-width: 100vw;
+      height: 100%;
+      max-height: calc(100vh - 75px);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: #000;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      transition: max-width 0.3s, max-height 0.3s;
+    }
+
+    @media (max-width: 768px) {
+      .modal-header {
+        flex-direction: column;
+        gap: 0.6rem;
+        padding: 0.6rem 0.75rem;
+      }
+      .modal-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+      }
+      .iframe-container {
+        padding: 0;
+      }
+      .game-frame {
+        border: none;
+        border-radius: 0;
+        max-height: calc(100vh - 100px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="#" class="brand">
+      <div class="brand-icon">⚔️</div>
+      <span class="brand-name">ARCADE HUB</span>
+    </a>
+    <div class="badge-live">
+      <span class="badge-dot"></span> 1 Playable Game Online
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1 class="hero-title">Experience Handcrafted Indie Games in Your Browser</h1>
+    <p class="hero-desc">Play immediately with zero downloads. Compatible with PC keyboards and mobile touchscreens.</p>
+  </div>
+
+  <main>
+    <div class="section-header">
+      <h2 class="section-title">🕹️ Featured Games</h2>
+    </div>
+
+    <div class="games-grid">
+      <!-- Pixel Knight Card -->
+      <article class="game-card">
+        <div class="game-cover">
+          <img src="games/pixel-knight/favicon.png" alt="Pixel Knight Cover" class="game-cover-art" onerror="this.style.display='none'">
+          <div style="font-size: 3.5rem; color: #facc15;">🛡️</div>
+          <span class="game-tag">12 HEROES UPDATE</span>
+        </div>
+        <div class="game-body">
+          <h3 class="game-title">Pixel Knight</h3>
+          <p class="game-desc">
+            A fast-paced dark fantasy platformer! Unleash 12 unique heroes, master special abilities like Frost Nova and Celestial Rift, and conquer 10 challenging campaign stages and brutal bosses.
+          </p>
+          <div class="game-meta">
+            <span>🎮 Action / Platformer</span>
+            <span>📱 PC & Mobile</span>
+          </div>
+          <button class="play-btn" onclick="openGame('games/pixel-knight/index.html', 'Pixel Knight — The Forgotten Forest')">
+            ▶ Play Now in Browser
+          </button>
+        </div>
+      </article>
+
+      <!-- Slot for future game 1 -->
+      <div class="coming-soon-card">
+        <div class="coming-soon-icon">🚀</div>
+        <h4 class="coming-soon-title">Next Game Incoming</h4>
+        <p class="coming-soon-desc">New indie adventures and arcade experiences are under development.</p>
+      </div>
+
+      <!-- Slot for future game 2 -->
+      <div class="coming-soon-card">
+        <div class="coming-soon-icon">🔮</div>
+        <h4 class="coming-soon-title">Mystery Project</h4>
+        <p class="coming-soon-desc">Stay tuned for future releases added directly to this portal!</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 Arcade Hub — Built for high-performance browser gaming.</p>
+  </footer>
+
+  <!-- Modal for instant browser play -->
+  <div class="game-modal" id="gameModal">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span class="modal-title" id="modalGameTitle">Playing Game</span>
+        <span style="font-size:0.75rem; background:rgba(56,189,248,0.15); color:#38bdf8; padding:0.2rem 0.5rem; border-radius:4px; font-weight:600;">🔊 44.1kHz Stereo</span>
+      </div>
+      <div class="modal-controls">
+        <div class="res-control">
+          <span>Resolution:</span>
+          <select id="resSelect" class="res-select" onchange="changeResolution(this.value)">
+            <option value="fit" selected>📱 Auto / Fit Screen</option>
+            <option value="theater">🖥️ HD (1280×720)</option>
+            <option value="fhd">🔥 Full HD (1920×1080)</option>
+            <option value="classic">🕹️ Classic (960×540)</option>
+            <option value="mobile">📲 Mobile Phone</option>
+          </select>
+        </div>
+        <button class="tool-btn" onclick="toggleFullscreenFrame()">⛶ Fullscreen</button>
+        <button class="close-btn" onclick="closeGame()">✕ Close Game</button>
+      </div>
+    </div>
+    <div class="iframe-container" id="iframeContainer">
+      <iframe id="gameFrame" class="game-frame" src="" allowfullscreen allow="autoplay"></iframe>
+    </div>
+  </div>
+
+  <script>
+    function openGame(url, title) {
+      document.getElementById('modalGameTitle').innerText = title;
+      document.getElementById('gameFrame').src = url;
+      document.getElementById('gameModal').classList.add('active');
+      changeResolution(document.getElementById('resSelect').value);
+    }
+
+    function closeGame() {
+      document.getElementById('gameModal').classList.remove('active');
+      document.getElementById('gameFrame').src = '';
+    }
+
+    function changeResolution(mode) {
+      const frame = document.getElementById('gameFrame');
+      const container = document.getElementById('iframeContainer');
+      if (!frame || !container) return;
+      
+      if (mode === 'fit') {
+        frame.style.width = '100%';
+        frame.style.maxWidth = '100vw';
+        frame.style.height = '100%';
+        frame.style.maxHeight = 'calc(100vh - 75px)';
+        container.style.padding = '0.5rem';
+      } else if (mode === 'theater') {
+        frame.style.width = '1280px';
+        frame.style.maxWidth = '95vw';
+        frame.style.height = '720px';
+        frame.style.maxHeight = 'calc(100vh - 80px)';
+        container.style.padding = '1rem';
+      } else if (mode === 'fhd') {
+        frame.style.width = '1920px';
+        frame.style.maxWidth = '98vw';
+        frame.style.height = '1080px';
+        frame.style.maxHeight = 'calc(100vh - 80px)';
+        container.style.padding = '1rem';
+      } else if (mode === 'classic') {
+        frame.style.width = '960px';
+        frame.style.maxWidth = '95vw';
+        frame.style.height = '540px';
+        frame.style.maxHeight = 'calc(100vh - 80px)';
+        container.style.padding = '1rem';
+      } else if (mode === 'mobile') {
+        frame.style.width = '100%';
+        frame.style.maxWidth = '460px';
+        frame.style.height = '100%';
+        frame.style.maxHeight = '820px';
+        container.style.padding = '0.5rem';
+      }
+    }
+
+    function toggleFullscreenFrame() {
+      const frame = document.getElementById('gameFrame');
+      if (!document.fullscreenElement) {
+        if (frame.requestFullscreen) {
+          frame.requestFullscreen();
+        } else if (frame.webkitRequestFullscreen) {
+          frame.webkitRequestFullscreen();
+        } else if (frame.msRequestFullscreen) {
+          frame.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // ESC to close modal
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeGame();
+    });
+  </script>
+</body>
+</html>
